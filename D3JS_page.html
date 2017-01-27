@@ -1,0 +1,61 @@
+<html>
+	<head>
+		<script type"text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+	</head>
+	<style type="text/css">
+		.line{
+			fill:none; 
+			stroke:steelblue;
+			stroke-width:2px;
+		}
+	</style>
+	<body>
+		<script type="text/javascript">
+		//Establece los margenes del grafico
+			var margin={top:20, bottom:20, left:30, right:50},
+			width=960-margin.left-margin.right,
+			height=500-margin.top-margin.bottom;
+
+			//establezco el rango
+			var x = d3.scaleLinear().range([0,width]);
+			var y = d3.scaleLinear().range([height,0]);
+
+			//Establecer valores de las lineas
+			var valueline = d3.line()
+				.x(function(d){return x(d.c1);})
+				.y(function(d){return y(d.c2);});
+
+			var container = d3.select("body")
+				.append("svg")
+				.attr("width", width+margin.left+margin.right)
+				.attr("height", height+margin.top+margin.bottom)
+				.append("g")
+				.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+			//cargar datos
+			d3.csv("datos.csv", function(error, data){
+				if(error) throw error;
+
+				data.forEach(function(d){
+					d.c1=d.c1;
+					d.c2=d.c2
+				});
+
+				x.domain([0,d3.max(data,function(d){return d.c1;})]);
+				y.domain([0,d3.max(data,function(d){return d.c2;})]);
+
+				container.append("path")
+					.data([data])
+					.attr("class","line")
+					.attr("d", valueline);
+
+				container.append("g")
+					.attr("transform", "translate(0,"+height+")")
+					.call(d3.axisBottom(x));
+
+				container.append("g")
+					.call(d3.axisLeft(y));
+			});
+		</script>
+	</body>
+</html>
